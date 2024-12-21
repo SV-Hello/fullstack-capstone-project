@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import {urlConfig} from '../../config';
+import { useAppContext } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+
 import './LoginPage.css';
 
 function LoginPage() {
@@ -6,13 +10,61 @@ function LoginPage() {
     //insert code here to create useState hook variables for email, password
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [incorrect, setIncorrect] = useState('');
+
+    const navigate = useNavigate();
+    const bearerToken = sessionStorage.getItem('bearer-token');
+    const { setIsLoggedIn } = useAppContext();
+    
+    useEffect(() => {
+        if (sessionStorage.getItem('auth-token')) {
+          navigate('/app')
+        }
+    }, [navigate])
 
     // insert code here to create handleLogin function and include console.log
     const handleLogin = async () => {
-        console.log("Login attempted")
+        try{
+            //first task
+            const response = await fetch(`${urlConfig.backendUrl}/api/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json',
+                    'Authorization': bearerToken ? `Bearer ${bearerToken}` : '', // Include Bearer token if available
+                },
+                body: JSON.stringify({    
+                    email: email,
+                    password: password,
+                })
+            });
+
+            const json = await res.json();
+            console.log('Json',json);
+            if (json.authtoken) {
+                sessionStorage.setItem('auth-token', json.authtoken);
+                sessionStorage.setItem('name', json.userName);
+                sessionStorage.setItem('email', json.userEmail);
+
+                setIsLoggedIn(true);
+
+                navigate('/app');
+            } 
+            else {
+                document.getElementById("email").value="";
+                document.getElementById("password").value="";
+                setIncorrect("Wrong password. Try again.");
+                
+                setTimeout(() => {
+                    setIncorrect("");
+                }, 2000);
+            }
+            
+        } catch (e) {
+            console.log("Error fetching details: " + e.message);
+        }
     }
 
-        return (
+    return (
       <div className="container mt-5">
         <div className="row justify-content-center">
           <div className="col-md-6 col-lg-4">
