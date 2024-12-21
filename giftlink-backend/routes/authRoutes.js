@@ -40,7 +40,7 @@ router.post('/register', async (req, res) => {
             password: hash,
             createdAt: new Date(),
         });
-        \//Task 5: Create JWT authentication with user._id as payload
+        //Task 5: Create JWT authentication with user._id as payload
         const payload = {user: { id: newUser.insertedId, },};
 
         const authtoken = jwt.sign(payload, JWT_SECRET);
