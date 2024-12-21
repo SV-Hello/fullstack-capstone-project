@@ -26,6 +26,11 @@ router.post('/register', async (req, res) => {
         //Task 3: Check for existing email
         const existingEmail = await collection.findOne({ email: req.body.email });
 
+        if(existingEmail) {
+            logger.error('Email id already exists');
+            return res.status(400).json({ error: 'Email id already exists' });
+        }
+
         const salt = await bcryptjs.genSalt(10);
         const hash = await bcryptjs.hash(req.body.password, salt);
         const email = req.body.email;
@@ -45,6 +50,7 @@ router.post('/register', async (req, res) => {
         logger.info('User registered successfully');
         res.json({authtoken,email});
     } catch (e) {
+        logger.error(e);
         return res.status(500).send('Internal server error');
     }
 });
@@ -90,6 +96,7 @@ router.post('/login', async (req, res) => {
             return res.status(404).json({ error: 'User not found' });
         }
     } catch (e) {
+        logger.error(e);
          return res.status(500).send('Internal server error');
 
     }
