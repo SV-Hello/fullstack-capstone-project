@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {urlConfig} from '../../config';
 import { useAppContext } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -38,7 +38,7 @@ function LoginPage() {
                 })
             });
 
-            const json = await res.json();
+            const json = await response.json();
             console.log('Json',json);
             if (json.authtoken) {
                 sessionStorage.setItem('auth-token', json.authtoken);
